@@ -815,14 +815,26 @@ public class MainActivity extends AppCompatActivity {
         px(fi);
         loses = new ArrayList<>();
         fileMap = new ArrayList<>();
+        String [] strIndex = {".mp3",".wma",".flac",".aac",".mmf",".amr",".m4a",".m4r",".ogg",".mp2",".wav"};
         for (int i = 0; i < fi.length; i++) {
             Map<String, Object> map = new HashMap<>();
             final File f = fi[i];
             if (f.isDirectory()) {
                 loses.add(f);
-                map.put("image", R.drawable.ic_folder);
+                map.put("image", R.drawable.ic_fold);
+                map.put("text", fi[i].getName().trim());
+            }else if (f.isFile()) {
+                for (int innum = 0; innum < strIndex.length; innum++) {
+                    if (fi[i].getName().toLowerCase().endsWith(strIndex[innum])) {
+                        map.put("image", R.drawable.ic_action_name);
+                        map.put("text", fi[i].getName().trim());
+                        break;
+                    }else {
+                        map.put("image", R.drawable.ic_other);
+                        map.put("text", fi[i].getName().trim());
+                    }
+                }
             }
-            map.put("text", fi[i].getName().trim());
             fileMap.add(map);
         }
 

@@ -16,7 +16,7 @@
             android:id="@+id/image2"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:src="@drawable/bg_yalujia" />
+            android:src="@drawable/ic_fold" />
 
         <TextView
             android:id="@+id/text2"
