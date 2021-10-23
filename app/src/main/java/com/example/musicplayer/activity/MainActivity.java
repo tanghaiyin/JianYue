@@ -325,7 +325,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (applyPermission(RECODEGETMUSI)) {
+//                    String path = MainActivity.this.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS).getAbsolutePath();
                     String path = Environment.getExternalStorageDirectory().getAbsolutePath();
+//                    File externalFilesDir = MainActivity.this.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS);
+
                     selectFile(path);
                 }
             }
@@ -337,14 +340,26 @@ public class MainActivity extends AppCompatActivity {
     public boolean applyPermission(int requestCode) {
         boolean isPermission;
         String[] permissions = {Manifest.permission.WRITE_EXTERNAL_STORAGE};
-        int code = checkCallingOrSelfPermission(permissions[0]);
-        if (code == PackageManager.PERMISSION_GRANTED) {
-            isPermission = true;
-        } else {
-            isPermission = false;
-            ActivityCompat.requestPermissions(MainActivity.this, permissions, requestCode);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R){
+            if (Environment.isExternalStorageManager()){
+                isPermission = true;
+            }else {
+                isPermission = false;
+            }
+            Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
+            intent.setData(Uri.parse("package:" + context.getPackageName()));
+            startActivityForResult(intent, requestCode);
+        }else {
+            int code = checkCallingOrSelfPermission(permissions[0]);
+            if (code == PackageManager.PERMISSION_GRANTED) {
+                isPermission = true;
+            } else {
+                isPermission = false;
+                ActivityCompat.requestPermissions(MainActivity.this, permissions, requestCode);
+            }
         }
         return isPermission;
+
     }
 
     private class ServiceNeedBroadcastReceiver2 extends BroadcastReceiver {
@@ -654,6 +669,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void selectFile(String path) {
         filePath = path;
+        Log.e("fless",path+"");
         File directory = new File(path);
         File[] files = directory.listFiles();
         readFile(files);
@@ -772,6 +788,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void readFile(final File[] fi) {
+
         px(fi);
         loses = new ArrayList<>();
         fileMap = new ArrayList<>();
