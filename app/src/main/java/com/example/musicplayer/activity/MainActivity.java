@@ -631,6 +631,8 @@ public class MainActivity extends AppCompatActivity {
                         bottomCircle.setImageResource(R.drawable.bg_gradientramp_default);
                     }
                     unService("maintoplay");
+                }else{
+                    unService("onPlay");
                 }
             }
         });
