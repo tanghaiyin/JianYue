@@ -1,6 +1,11 @@
 package com.example.musicplayer.tool;
 
+import static com.example.musicplayer.activity.MainActivity.musicCon;
+import static com.example.musicplayer.activity.MainActivity.musicReceiver;
+import static com.example.musicplayer.activity.MainActivity.notificationMgr;
+
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
@@ -73,6 +78,18 @@ public class ExceptionCaugh implements Thread.UncaughtExceptionHandler {
             }
             //退出程序
             ClearContent.getInstance().exit();
+            Intent musicServiceIntent = new Intent(mContext, MusicService.class);
+            if (notificationMgr != null) {
+                notificationMgr.cancelAll();
+            }
+            if (musicCon != null) {
+                mContext.unbindService(musicCon);
+            }
+            if (musicReceiver != null) {
+                mContext.unregisterReceiver(musicReceiver);
+            }
+            mContext.stopService(musicServiceIntent);
+            System.exit(0);
             android.os.Process.killProcess(android.os.Process.myPid());
             System.exit(2);
         }

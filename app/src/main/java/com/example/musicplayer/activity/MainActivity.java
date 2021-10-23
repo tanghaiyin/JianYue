@@ -40,6 +40,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -82,20 +83,20 @@ public class MainActivity extends AppCompatActivity {
     private String filePath;
     private String nowMusic;
     private int position;
-    private final int RECODEBACKFILL = 0x22f, RECODEGETMUSI = 0x33f, RECODEPRE = 0x55f;
+    private final int RECODEBACKFILL = 0x22f, RECODEGETMUSI = 0x33f, RECODEPRE = 0x55f,MANGER_WRITE = 0x014f;
     private Intent musicServiceIntent;
     private Dialog folderDialog = null;
     private GridView filegv;
     private StringBuilder filePathBuild;
     private WriteCof writeCof;
     public static MusicService.SimpleBinder mBinder = null;
-    private MainActivity.mConnection2 musicCon = null;
+    public static MainActivity.mConnection2 musicCon = null;
     private List<File> loses;
     private List<Map<String, Object>> fileMap;
-    private MusicReceiver musicReceiver;
+    public static MusicReceiver musicReceiver;
     public static final String MAIN_SERVICE_NEED = "action.MainService";
     private MainActivity.ServiceNeedBroadcastReceiver2 broadcastReceiver2 = null;
-    private NotificationManager notificationMgr;
+    public static NotificationManager notificationMgr;
     private Notification notify;
     private Notification.Builder builder;
     public static final String PLAY = "play";
@@ -154,7 +155,8 @@ public class MainActivity extends AppCompatActivity {
     private void checkNotifySetting() {
         final Intent localIntent = new Intent();
         AlertDialog.Builder ad = new AlertDialog.Builder(MainActivity.this);
-        ad.setMessage("是否前往开启通知栏权限，后台播放通知栏操作更方便")
+        ad.setMessage("是否前往开启通知栏权限，后台播放通知栏操作更方便(若已开启请忽略)")
+                .setCancelable(false)
                 .setPositiveButton("前往开启", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
@@ -340,16 +342,6 @@ public class MainActivity extends AppCompatActivity {
     public boolean applyPermission(int requestCode) {
         boolean isPermission;
         String[] permissions = {Manifest.permission.WRITE_EXTERNAL_STORAGE};
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R){
-            if (Environment.isExternalStorageManager()){
-                isPermission = true;
-            }else {
-                isPermission = false;
-            }
-            Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
-            intent.setData(Uri.parse("package:" + context.getPackageName()));
-            startActivityForResult(intent, requestCode);
-        }else {
             int code = checkCallingOrSelfPermission(permissions[0]);
             if (code == PackageManager.PERMISSION_GRANTED) {
                 isPermission = true;
@@ -357,7 +349,6 @@ public class MainActivity extends AppCompatActivity {
                 isPermission = false;
                 ActivityCompat.requestPermissions(MainActivity.this, permissions, requestCode);
             }
-        }
         return isPermission;
 
     }
@@ -703,88 +694,120 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void px(File[] files2) {
-        Collections.sort(Arrays.asList(files2), new Comparator<File>() {
-            @Override
-            public int compare(File o1, File o2) {
-                //文件夹排前面
-                if (o1.isDirectory() && o2.isFile()) {
-                    return -1;
-                }
-                if (o1.isFile() && o2.isDirectory()) {
-                    return 1;
-                }
-                //其次文本
-                if (o1.getName().endsWith(".txt") && !o2.getName().endsWith(".txt")) {
-                    return -1;
-                }
-                if (!o1.getName().endsWith(".txt") && o2.getName().endsWith(".txt")) {
-                    return 1;
-                }
-                //其次图片
-                if (o1.getName().endsWith(".png") && !o2.getName().endsWith(".png")) {
-                    return -1;
-                }
-                if (!o1.getName().endsWith(".png") && o2.getName().endsWith(".png")) {
-                    return 1;
-                }
-                if (o1.getName().endsWith(".jpg") && !o2.getName().endsWith(".jpg")) {
-                    return -1;
-                }
-                if (!o1.getName().endsWith(".jpg") && o2.getName().endsWith(".jpg")) {
-                    return 1;
-                }
-                //其次音乐
-                if (o1.getName().endsWith(".mp3") && !o2.getName().endsWith(".mp3")) {
-                    return -1;
-                }
-                if (!o1.getName().endsWith(".mp3") && o2.getName().endsWith(".mp3")) {
-                    return 1;
-                }
-                String[] zm = {"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"};
-                for (int q = 0; q < zm.length; q++) {
-                    if (o1.getName().substring(0, 1).equalsIgnoreCase(zm[q]) && !o2.getName().substring(0, 1).equalsIgnoreCase(zm[q])) {
+        try {
+            Collections.sort(Arrays.asList(files2), new Comparator<File>() {
+                @Override
+                public int compare(File o1, File o2) {
+                    //文件夹排前面
+                    if (o1.isDirectory() && o2.isFile()) {
                         return -1;
                     }
-                    if (!o1.getName().substring(0, 1).equalsIgnoreCase(zm[q]) && o2.getName().substring(0, 1).equalsIgnoreCase(zm[q])) {
+                    if (o1.isFile() && o2.isDirectory()) {
                         return 1;
                     }
-                }
-                String[] sz = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"};
-                for (int q = 0; q < sz.length; q++) {
-                    if (o1.getName().substring(0, 1).equalsIgnoreCase(sz[q]) && !o2.getName().substring(0, 1).equalsIgnoreCase(sz[q])) {
+                    //其次文本
+                    if (o1.getName().endsWith(".txt") && !o2.getName().endsWith(".txt")) {
                         return -1;
                     }
-                    if (!o1.getName().substring(0, 1).equalsIgnoreCase(sz[q]) && o2.getName().substring(0, 1).equalsIgnoreCase(sz[q])) {
+                    if (!o1.getName().endsWith(".txt") && o2.getName().endsWith(".txt")) {
                         return 1;
                     }
-                }
-                //其次中文
-                if (isChinese2(o1.getName().substring(0, 1)) && !isChinese2(o2.getName().substring(0, 1))) {
-                    return -1;
-                }
-                if (!isChinese2(o1.getName().substring(0, 1)) && isChinese2(o2.getName().substring(0, 1))) {
-                    return 1;
-                }
-                //其次符号
-                String[] fh = {"!", "@", "#", "$", "%", "^", "&", "(", ")", "_", "-", "=", "+", "[", "]", "{", "}", ",", "，", ".", "。", "-", "、", ";", "；", "“", "”", "'", "‘", "’"};
-                for (int u = 0; u < fh.length; u++) {
-                    if (o1.getName().substring(0, 1).equalsIgnoreCase(fh[u]) && !o2.getName().substring(0, 1).equalsIgnoreCase(fh[u])) {
+                    //其次图片
+                    if (o1.getName().endsWith(".png") && !o2.getName().endsWith(".png")) {
                         return -1;
                     }
-                    if (!o1.getName().substring(0, 1).equalsIgnoreCase(fh[u]) && o2.getName().substring(0, 1).equalsIgnoreCase(fh[u])) {
+                    if (!o1.getName().endsWith(".png") && o2.getName().endsWith(".png")) {
                         return 1;
                     }
+                    if (o1.getName().endsWith(".jpg") && !o2.getName().endsWith(".jpg")) {
+                        return -1;
+                    }
+                    if (!o1.getName().endsWith(".jpg") && o2.getName().endsWith(".jpg")) {
+                        return 1;
+                    }
+                    //其次音乐
+                    if (o1.getName().endsWith(".mp3") && !o2.getName().endsWith(".mp3")) {
+                        return -1;
+                    }
+                    if (!o1.getName().endsWith(".mp3") && o2.getName().endsWith(".mp3")) {
+                        return 1;
+                    }
+                    String[] zm = {"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"};
+                    for (int q = 0; q < zm.length; q++) {
+                        if (o1.getName().substring(0, 1).equalsIgnoreCase(zm[q]) && !o2.getName().substring(0, 1).equalsIgnoreCase(zm[q])) {
+                            return -1;
+                        }
+                        if (!o1.getName().substring(0, 1).equalsIgnoreCase(zm[q]) && o2.getName().substring(0, 1).equalsIgnoreCase(zm[q])) {
+                            return 1;
+                        }
+                    }
+                    String[] sz = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"};
+                    for (int q = 0; q < sz.length; q++) {
+                        if (o1.getName().substring(0, 1).equalsIgnoreCase(sz[q]) && !o2.getName().substring(0, 1).equalsIgnoreCase(sz[q])) {
+                            return -1;
+                        }
+                        if (!o1.getName().substring(0, 1).equalsIgnoreCase(sz[q]) && o2.getName().substring(0, 1).equalsIgnoreCase(sz[q])) {
+                            return 1;
+                        }
+                    }
+                    //其次中文
+                    if (isChinese2(o1.getName().substring(0, 1)) && !isChinese2(o2.getName().substring(0, 1))) {
+                        return -1;
+                    }
+                    if (!isChinese2(o1.getName().substring(0, 1)) && isChinese2(o2.getName().substring(0, 1))) {
+                        return 1;
+                    }
+                    //其次符号
+                    String[] fh = {"!", "@", "#", "$", "%", "^", "&", "(", ")", "_", "-", "=", "+", "[", "]", "{", "}", ",", "，", ".", "。", "-", "、", ";", "；", "“", "”", "'", "‘", "’"};
+                    for (int u = 0; u < fh.length; u++) {
+                        if (o1.getName().substring(0, 1).equalsIgnoreCase(fh[u]) && !o2.getName().substring(0, 1).equalsIgnoreCase(fh[u])) {
+                            return -1;
+                        }
+                        if (!o1.getName().substring(0, 1).equalsIgnoreCase(fh[u]) && o2.getName().substring(0, 1).equalsIgnoreCase(fh[u])) {
+                            return 1;
+                        }
+                    }
+                    //其次名称长度
+                    if (o1.getName().length() < o2.getName().length()) {
+                        return -1;
+                    }
+                    if (o1.getName().length() > o2.getName().length()) {
+                        return 1;
+                    }
+                    return o1.getName().compareTo(o2.getName());
                 }
-                //其次名称长度
-                if (o1.getName().length() < o2.getName().length()) {
-                    return -1;
+            });
+        }catch (NullPointerException nullPointerException){
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R){
+                if (Environment.isExternalStorageManager()){
+                    closeNotification();
+                }else {
+                    AlertDialog.Builder ad = new AlertDialog.Builder(MainActivity.this);
+                    ad.setMessage("软件无法访问文件，请开启权限")
+                            .setCancelable(false)
+                            .setPositiveButton("前往开启", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
+                                    intent.setData(Uri.parse("package:" + context.getPackageName()));
+                                    startActivityForResult(intent, MANGER_WRITE);
+                                }
+                            })
+                            .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+
+                                }
+                            }).show();
                 }
-                if (o1.getName().length() > o2.getName().length()) {
-                    return 1;
-                }
-                return o1.getName().compareTo(o2.getName());
+
+            }else {
+                closeNotification();
             }
-        });
+
+        }
+
+
     }
 
     private void readFile(final File[] fi) {
@@ -987,6 +1010,7 @@ public class MainActivity extends AppCompatActivity {
         registerReceiver(musicReceiver, intentFilter);
     }
 
+
     public class MusicReceiver extends BroadcastReceiver {
 
         public static final String TAG = "MusicReceiver";
@@ -1048,6 +1072,23 @@ public class MainActivity extends AppCompatActivity {
         } else {
             return super.onKeyDown(keyCode, event);
         }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.R)
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+//        if (resultCode == RESULT_OK) {
+            switch (requestCode) {
+                case MANGER_WRITE:
+                    if (!Environment.isExternalStorageManager()){
+                        Toast.makeText(this,"没有开启权限",Toast.LENGTH_LONG).show();
+                    }
+                    break;
+            }
+//        }else {
+//            Toast.makeText(this,"取消",Toast.LENGTH_LONG).show();
+//        }
     }
 
     @Override
