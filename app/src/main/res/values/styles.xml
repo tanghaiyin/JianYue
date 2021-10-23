@@ -1,0 +1,16 @@
+<resources>
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+    <style name="AppNoActionBar" parent="Theme.AppCompat.NoActionBar">
+<!--        <item name="android:windowBackground">@mipmap/ic_launcher</item>-->
+    </style>
+    <style name="FullScreen">
+<!--        不显示标题-->
+        <item name="windowNoTitle">true</item>
+<!--        全屏-->
+        <item name="android:windowFullscreen">true</item>
+    </style>
+</resources>

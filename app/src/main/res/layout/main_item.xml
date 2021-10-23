@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/partext"
+    android:layout_width="match_parent"
+    android:layout_height="140px"
+    android:background="@drawable/di_bottom"
+    android:layout_weight="10"
+    android:orientation="horizontal">
+
+    <ImageView
+        android:visibility="invisible"
+        android:id="@+id/text_item_img"
+        android:background="@drawable/ic_action_name"
+        android:layout_width="50dp"
+        android:layout_height="match_parent"
+        android:layout_marginRight="20dp"/>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <TextView
+            android:layout_weight="9"
+            android:text="曲名"
+            android:id="@+id/btn_item_test"
+            android:gravity="center"
+            android:textAlignment="textStart"
+            android:layout_width="0dp"
+            android:textStyle="bold"
+            android:textColor="#000000"
+            android:lines="1"
+            android:singleLine="true"
+            android:layout_height="match_parent"
+            tools:ignore="RtlCompat" />
+
+
+        <TextView
+            android:layout_weight="1.5"
+            android:text="⋮"
+            android:layout_marginRight="2dp"
+            android:textSize="25dp"
+            android:id="@+id/btn_item_test2"
+            android:gravity="center"
+            android:layout_width="0dp"
+            android:textStyle="bold"
+            android:textColor="#808080"
+            android:layout_height="match_parent"/>
+    </LinearLayout>
+
+
+
+
+
+</LinearLayout>

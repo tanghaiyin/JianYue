@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activity.MainActivity"
+    android:background="#ffffff">
+
+<!--    <TextView-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:text="Hello World!"-->
+<!--        app:layout_constraintBottom_toBottomOf="parent"-->
+<!--        app:layout_constraintLeft_toLeftOf="parent"-->
+<!--        app:layout_constraintRight_toRightOf="parent"-->
+<!--        app:layout_constraintTop_toTopOf="parent" />-->
+
+    <LinearLayout
+
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <Button
+                android:id="@+id/open_folder"
+                android:layout_weight="10"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="导入歌单"
+                android:background="#009688"/>
+            <TextView
+                android:text="退出"
+                android:id="@+id/exitpage"
+                android:gravity="center"
+                android:background="#009688"
+                android:layout_width="50dp"
+                android:layout_height="match_parent"/>
+        </LinearLayout>
+
+
+
+        <androidx.recyclerview.widget.RecyclerView
+
+            android:id="@+id/music_list"
+            android:layout_weight="5"
+            android:layout_width="match_parent"
+            tools:listitem="@layout/main_item"
+            android:layout_height="match_parent">
+
+        </androidx.recyclerview.widget.RecyclerView>
+        <LinearLayout
+
+
+            android:background="@drawable/di_top"
+            android:layout_width="match_parent"
+            android:orientation="horizontal"
+            android:layout_height="70dp">
+            <com.example.musicplayer.tool.CirImageView
+                android:layout_marginLeft="20dp"
+                android:src="@drawable/bg_gradientramp_default"
+                android:id="@+id/ci"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_gravity="center"/>
+            <LinearLayout
+                android:layout_marginLeft="25dp"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="vertical">
+                <TextView
+                    android:id="@+id/tvtop"
+                    android:lines="1"
+                    android:singleLine="true"
+                    android:layout_gravity="left"
+                    android:textStyle="bold"
+                    android:textColor="#000000"
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/app_name"/>
+
+                <TextView
+                    android:id="@+id/tvbom"
+                    android:lines="1"
+                    android:singleLine="true"
+                    android:layout_gravity="left"
+                    android:layout_width="100dp"
+                    android:textColor="#808080"
+                    android:layout_height="wrap_content"
+                    android:text="@string/app_name"/>
+            </LinearLayout>
+            <LinearLayout
+                android:layout_marginLeft="25dp"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="right"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btn_left"
+                    android:layout_gravity="center"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
+                    android:background="@drawable/ic_play_previous"/>
+                <Button
+                    android:id="@+id/btn_playing"
+                    android:layout_gravity="center"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
+                    android:background="@drawable/ic_play_start"/>
+
+
+                <Button
+                    android:layout_gravity="center"
+                    android:id="@+id/btn_right"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
+                    android:background="@drawable/ic_play_next" />
+
+
+            </LinearLayout>
+
+        </LinearLayout>
+    </LinearLayout>
+<!--    <include layout="@layout/main_navigation_bottom" />-->
+
+</androidx.constraintlayout.widget.ConstraintLayout>
